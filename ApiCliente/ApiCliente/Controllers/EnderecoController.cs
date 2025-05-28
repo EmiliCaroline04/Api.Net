@@ -1,95 +1,99 @@
-﻿using ApiClientes.Services;
-using ApiClientes.Services.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using ApiClientes.Services.DTOs;
+using ApiClientes.Services;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using ApiClientes.Controllers.ApiClientes.Controllers;
+using System;
 
 namespace ApiClientes.Controllers
 {
-    [Route("api/clientes/{clienteId}/enderecos")]
+    [Route("api/Clientes/{id}/[controller]")]
     [ApiController]
-    public class EnderecosController : ControllerBase
+    public class EnderecosController : Controller
     {
-        private readonly EnderecoService _service;
+        private readonly EnderecosService _service;
 
-        public EnderecosController(EnderecoService service)
+        public EnderecosController(EnderecosService service)
         {
             _service = service;
         }
 
-        [HttpPost]
-        public ActionResult<CriarEnderecoDTO> Adicionar(int clienteId, [FromBody] CriarEnderecoDTO body)
-        {
-            try
-            {
-                var response = _service.Criar(clienteId, body);
-                return Ok(response);
-            }
-            catch (BadRequestException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (System.Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
         [HttpGet]
-        public ActionResult<IEnumerable<CriarEnderecoDTO>> BuscarTodos(int clienteId)
+        public ActionResult<List<EnderecoDTO>> GetEndereco(int id)
         {
             try
             {
-                var response = _service.BuscarTodos(clienteId);
-                return Ok(response);
+                var response = _service.ListarEnderecos(id);
+                return Ok(response); // 200
             }
             catch (System.Exception e)
             {
-                return StatusCode(500, e.Message);
+                return StatusCode(500, e.Message); // 500
             }
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<CriarEnderecoDTO> BuscarPorId(int clienteId, int id)
+        // POST: api/clientes/enderecos
+        [HttpPost]
+        public ActionResult<EnderecoDTO> Adicionar(int id, [FromBody] CriarEnderecoDTO body)
         {
             try
             {
-                var response = _service.BuscarPorId(clienteId, id);
+                var response = _service.Adicionar(id, body);
                 return Ok(response);
             }
-            catch (System.Exception e)
+            catch (BadRequestException B)
             {
-                return StatusCode(500, e.Message);
+                return BadRequest(B.Message);
+            }
+            catch (NotFoundException N)
+            {
+                return NotFound(N.Message);
+            }
+            catch (System.Exception E)
+            {
+                return StatusCode(500, E.Message);
             }
         }
 
-        [HttpPut("{id}")]
-        public ActionResult<CriarEnderecoDTO> Atualizar(int clienteId, int id, [FromBody] CriarEnderecoDTO body)
+        // GET: api/clientes/enderecos/{idEndereco}
+        [HttpGet("{idEndereco}")]
+        public ActionResult<EnderecoDTO> BuscarEnderecoDeCliente(int id, int idEndereco)
         {
             try
             {
-                var response = _service.Atualizar(clienteId, id, body);
+                var response = _service.BuscarEnderecoDeCliente(id, idEndereco);
                 return Ok(response);
             }
-            catch (System.Exception e)
+            catch (NotFoundException N)
             {
-                return StatusCode(500, e.Message);
+                return NotFound(N.Message);
+            }
+            catch (System.Exception E)
+            {
+                return StatusCode(500, E.Message);
             }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Deletar(int clienteId, int id)
+        // DELETE: api/clientes/{idCliente}/enderecos/{idEndereco}
+        [HttpDelete]
+        public IActionResult DeletarEnderecoDeCliente(int id, int idEndereco)
         {
             try
             {
-                _service.Deletar(clienteId, id);
+                _service.DeletarEnderecoDeCliente(id, idEndereco);
                 return NoContent();
             }
-            catch (System.Exception e)
+            catch (NotFoundException N)
             {
-                return StatusCode(500, e.Message);
+                return NotFound(N.Message);
+            }
+            catch (System.Exception E)
+            {
+                return StatusCode(500, E.Message);
             }
         }
+
+
     }
 
     [Serializable]
@@ -107,5 +111,4 @@ namespace ApiClientes.Controllers
         {
         }
     }
-
 }

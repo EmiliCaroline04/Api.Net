@@ -1,106 +1,111 @@
 ﻿using ApiCliente.Database.Models;
-using ApiCliente.Services.Validations;
+using ApiClientes.Controllers;
+using ApiClientes.Controllers.ApiClientes.Controllers;
 using ApiClientes.Services.DTOs;
 using ApiClientes.Services.Parsers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace ApiClientes.Services
 {
-    public class EnderecoService
+    public class EnderecosService
     {
         private readonly ClientesContext _dbcontext;
 
-        public EnderecoService(ClientesContext dbcontext)
+        public EnderecosService(ClientesContext dbcontext)
         {
             _dbcontext = dbcontext;
         }
 
-        public EnderecoDTO Criar(int clienteId, CriarEnderecoDTO dto)
+        public List<EnderecoDTO> ListarEnderecos(int id)
         {
-            EnderecoValidation.ValidarCriarEndereco(dto);
+            List<EnderecoDTO> response = new();
+            var enderecos = _dbcontext.TbEnderecos.Where(e => e.Clienteid == id).ToList();
+            foreach (var endereco in enderecos)
+            {
+                response.Add(EnderecoParser.ToEndereco(endereco));
+            }
+            return response;
+        }
+        // Adiciona um novo endereço ao cliente
+        public EnderecoDTO Adicionar(int idCliente, CriarEnderecoDTO dto)
+        {
 
-            TbEndereco novoEndereco = EnderecoParser.ToTbEndereco(dto);
-            novoEndereco.Clienteid = clienteId;
+            TbEndereco novoEndereco = EnderecoParser.ToTbEnderecoDTO(dto);
+            // Exemplo de validação antes de salvar
+            if (dto.uf.Length > 2)
+                throw new BadRequestException("O campo UF deve ter no máximo 2 caracteres.");
+            var cliente = _dbcontext.TbClientes.Find(idCliente);
+            if (cliente == null)
+                throw new NotFoundException("Cliente não encontrado.");
+
+            //var novoEnd = new TbEndereco
+            //{
+            //    Clienteid = idCliente,
+            //    Cidade = dto.cidade,
+            //    Bairro = dto.bairro,
+            //    Uf = dto.uf,
+            //    Complemento = dto.complemento,
+            //    Logradouro = dto.logradouro,
+            //    Numero = dto.numero,
+            //    Status = dto.status,
+            //    Cep = dto.cep
+            //};
+
+            novoEndereco.Clienteid = cliente.Id;
 
             _dbcontext.TbEnderecos.Add(novoEndereco);
             _dbcontext.SaveChanges();
 
-            return EnderecoParser.ToEnderecoDTO(novoEndereco);
+            return new EnderecoDTO
+            {
+                id = novoEndereco.Id,
+                idcliente = novoEndereco.Clienteid,
+                cidade = novoEndereco.Cidade,
+                bairro = novoEndereco.Bairro,
+                uf = novoEndereco.Uf,
+                complemento = novoEndereco.Complemento,
+                logradouro = novoEndereco.Logradouro,
+                numero = novoEndereco.Numero,
+                status = novoEndereco.Status,
+                cep = novoEndereco.Cep
+            };
         }
 
-        public IEnumerable<EnderecoDTO> BuscarTodos(int clienteId)
-        {
-            return _dbcontext.TbEnderecos
-                .Where(e => e.Clienteid == clienteId)
-                .Select(e => EnderecoParser.ToEnderecoDTO(e))
-                .ToList();
-        }
-
-        public EnderecoDTO BuscarPorId(int clienteId, int id)
+        public EnderecoDTO BuscarEnderecoDeCliente(int idCliente, int idEndereco)
         {
             var endereco = _dbcontext.TbEnderecos
-                .FirstOrDefault(e => e.Clienteid == clienteId && e.Id == id);
+                .FirstOrDefault(e => e.Clienteid == idCliente && e.Id == idEndereco);
 
             if (endereco == null)
-            {
-                throw new Exception("Endereço não encontrado");
-            }
+                throw new NotFoundException("Endereço não encontrado.");
 
-            return EnderecoParser.ToEnderecoDTO(endereco);
+            return new EnderecoDTO
+            {
+                id = endereco.Id,
+                idcliente = endereco.Clienteid,
+                cidade = endereco.Cidade,
+                bairro = endereco.Bairro,
+                uf = endereco.Uf,
+                complemento = endereco.Complemento,
+                logradouro = endereco.Logradouro,
+                numero = endereco.Numero,
+                status = endereco.Status,
+                cep = endereco.Cep
+            };
         }
 
-        public EnderecoDTO Atualizar(int clienteId, int id, DTOs.CriarEnderecoDTO body)
+        public void DeletarEnderecoDeCliente(int idCliente, int idEndereco)
         {
-            var endereco = _dbcontext.TbEnderecos.Find(id);
+            var endereco = _dbcontext.TbEnderecos
+                .FirstOrDefault(e => e.Clienteid == idCliente && e.Id == idEndereco);
 
-            if (endereco == null || endereco.Clienteid != clienteId)
-            {
-                throw new Exception("Endereço não encontrado");
-            }
-
-            endereco.Cep = body.Cep;
-            endereco.Logradouro = body.Logradouro;
-            endereco.Numero = body.Numero;
-            endereco.Complemento = body.Complemento;
-            endereco.Bairro = body.Bairro;
-            endereco.Cidade = body.Cidade;
-            endereco.Uf = body.Uf;
-
-            _dbcontext.SaveChanges();
-
-            return EnderecoParser.ToEnderecoDTO(endereco);
-        }
-
-        public void Deletar(int clienteId, int id)
-        {
-            var endereco = _dbcontext.TbEnderecos.Find(id);
-
-            if (endereco == null || endereco.Clienteid != clienteId)
-            {
-                throw new Exception("Endereço não encontrado");
-            }
+            if (endereco == null)
+                throw new NotFoundException("Endereço não encontrado.");
 
             _dbcontext.TbEnderecos.Remove(endereco);
             _dbcontext.SaveChanges();
         }
-
-        internal object Criar(int clienteId, Controllers.CriarEnderecoDTO body)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal object Atualizar(int clienteId, int id, Controllers.CriarEnderecoDTO body)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal object Criar(int clienteId, DTOs.CriarEnderecoDTO body)
-        {
-            throw new NotImplementedException();
-        }
     }
-
-  
 }

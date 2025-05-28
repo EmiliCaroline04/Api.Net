@@ -1,5 +1,6 @@
 ﻿using ApiClientes.Controllers;
 using ApiClientes.Services;
+using ApiClientes.Services.DTOs;
 using FluentValidation;
 using System;
 
@@ -44,5 +45,9 @@ namespace ApiCliente.Services.Validations
         public class AbstractValidator<T>
         {
         }
+    }
+
+    internal class CriaEnderecoDTO
+    {
     }
 }
