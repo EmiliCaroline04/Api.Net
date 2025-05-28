@@ -3,8 +3,8 @@ using ApiCliente.Services.DTOs;
 using ApiCliente.Services.Validations;
 using ApiClientes.Controllers;
 using ApiClientes.Services.Parsers;
-using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 
 namespace ApiClientes.Services
 {
@@ -38,12 +38,37 @@ namespace ApiClientes.Services
             throw new NotImplementedException();
         }
 
+        internal void AtualizarEndereco(int clienteId, int idEndereco, CriarEnderecoDTO dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object AtualizarParcial(int id, int idEndereco, AtualizarClienteDTO body)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void AtualizarParcial(int clienteId, int idEndereco, Dictionary<string, object> campos)
+        {
+            throw new NotImplementedException();
+        }
+
         internal object AtualizarParcial(int id, AtualizarClienteDTO body)
         {
             throw new NotImplementedException();
         }
 
+        internal void CriarEndereco(int clienteId, CriarEnderecoDTO dto)
+        {
+            throw new NotImplementedException();
+        }
+
         internal void Deletar(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ExcluirEndereco(int clienteId, int idEndereco)
         {
             throw new NotImplementedException();
         }
@@ -57,5 +82,9 @@ namespace ApiClientes.Services
         {
             throw new NotImplementedException();
         }
+    }
+
+    internal class AtualizarClienteDTO
+    {
     }
 }

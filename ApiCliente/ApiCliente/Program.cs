@@ -1,4 +1,3 @@
-
 using ApiCliente.Database.Models;
 using ApiClientes.Services;
 using Microsoft.AspNetCore.Builder;
@@ -19,8 +18,9 @@ namespace ApiCliente
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSingleton < ClientesContext>();
+            builder.Services.AddSingleton<ClientesContext>();
             builder.Services.AddScoped<ClientesService>();
+            builder.Services.AddScoped<EnderecoService>();
 
             var app = builder.Build();
 
