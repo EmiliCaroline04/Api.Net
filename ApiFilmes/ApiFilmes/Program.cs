@@ -8,6 +8,7 @@ using FluentValidation;
 using ApiFilmes.Services;
 using ApiFilmes.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ApiFilmes
 {
@@ -17,7 +18,7 @@ namespace ApiFilmes
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<FilmesContext>(options =>
-    options.UseNpgsql("Host=localhost;Database=api_filmes;Username=postgres;Password=masterkey"));
+    options.UseNpgsql("Host=localhost;Database=ApiFilmes;Username=postgres;Password=masterkey"));
 
             // Add services to the container.
 
@@ -29,6 +30,11 @@ namespace ApiFilmes
 
             builder.Services.AddValidatorsFromAssemblyContaining<FilmeValidators>();
 
+            builder.Services.AddControllers();
+            builder.Services.AddScoped<AtorService>();
+            builder.Services.AddScoped<GeneroService>();
+            builder.Services.AddScoped<FilmeService>();
+            builder.Services.AddScoped<AvaliacaoService>();
 
             builder.Services.AddScoped<IFilmeService, FilmeService>();
             builder.Services.AddScoped<IGeneroService, GeneroService>();
@@ -46,7 +52,6 @@ namespace ApiFilmes
             }
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -29,4 +29,6 @@ namespace ApiFilmes.Services.Exceptions
     {
         public ValidationException(string message) : base(message) { }
     }
+
+
 }

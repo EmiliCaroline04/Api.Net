@@ -9,4 +9,12 @@ namespace ApiFilmes.DTOs
         public string Comentario { get; set; }      // Comentário opcional
         public DateTime? DataAvaliacao { get; set; } // Data opcional (será DateTime.Now se não informado)
     }
+
+    public class CriarAvaliacaoDTO
+    {
+        public int Nota { get; set; }
+        public string Comentario { get; set; }
+        public DateTime? DataAvaliacao { get; set; }
+
+    }
 }

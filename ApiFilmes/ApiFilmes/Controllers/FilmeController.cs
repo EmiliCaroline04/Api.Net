@@ -1,6 +1,11 @@
 ﻿using ApiFilmes.DTOs;
+using ApiFilmes.BaseDados.Models; 
+using ApiFilmes.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using ApiFilmes.Services.Exceptions;
 
 namespace ApiFilmes.Controllers
 {
@@ -9,44 +14,80 @@ namespace ApiFilmes.Controllers
     [Produces("application/json", "application/xml")]
     public class FilmeController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly IFilmeService _filmeService;
+
+        public FilmeController(IMapper mapper, FilmeService filmeService)
+        {
+            _mapper = mapper;
+            _filmeService = filmeService;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            // var filmes = await _filmeService.BuscarTodosAsync();
-            return Ok(/*filmes*/);
+            var filmes = await _filmeService.BuscarTodosAsync();
+
+            // Mapear lista de entidades para DTOs
+            var dtoList = _mapper.Map<List<FilmeDTO>>(filmes);
+
+            return Ok(dtoList);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            // var filme = await _filmeService.BuscarPorIdAsync(id);
-            // if (filme == null) return NotFound();
-            return Ok(/*filme*/);
+            var filme = await _filmeService.BuscarPorIdAsync(id);
+
+            if (filme == null)
+                return NotFound();
+
+            var dto = _mapper.Map<FilmeDTO>(filme);
+
+            return Ok(dto);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] FilmeDTO dto)
         {
-            // var novoFilme = await _filmeService.AdicionarAsync(dto);
-            // return CreatedAtAction(nameof(GetById), new { id = novoFilme.Id }, novoFilme);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
+            // Mapear DTO para entidade
+            var filme = _mapper.Map<Filme>(dto);
+
+            // Adicionar no banco
+            var novoFilme = await _filmeService.AdicionarAsync(dto);
+
+            // Mapear novamente para DTO se quiser retornar
+            var novoFilmeDto = _mapper.Map<FilmeDTO>(novoFilme);
+
+            return CreatedAtAction(nameof(GetById), new { id = novoFilmeDto.Id }, novoFilmeDto);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] FilmeDTO dto)
         {
-            // await _filmeService.AtualizarAsync(id, dto);
-            return NoContent();
+            try
+            {
+                await _filmeService.AtualizarAsync(id, dto);
+                return NoContent();
+            }
+            catch (NotFoundException) // Se seu serviço lançar essa exceção
+            {
+                return NotFound();
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // await _filmeService.RemoverAsync(id);
-            return NoContent();
+            try
+            {
+                await _filmeService.RemoverAsync(id);
+                return NoContent();
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }
-   
-   
-

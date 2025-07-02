@@ -1,8 +1,10 @@
 ﻿using ApiFilmes.Database.Models;
 using ApiFilmes.DTOs;
+using ApiFilmes.Models;
 using ApiFilmes.Services.Exceptions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,11 +38,19 @@ namespace ApiFilmes.Services
 
         public async Task<GeneroDTO> AdicionarAsync(GeneroDTO dto)
         {
-            var genero = _mapper.Map<Models.Genero>(dto);
+            bool existe = await _context.Generos.AnyAsync(g => g.Nome == dto.Nome);
+            if (existe)
+                throw new ValidationException("Já existe um gênero com esse nome.");
+
+            var genero = _mapper.Map<Genero>(dto);
+
             _context.Generos.Add(genero);
             await _context.SaveChangesAsync();
+
             return _mapper.Map<GeneroDTO>(genero);
         }
+
+
 
         public async Task AtualizarAsync(int id, GeneroDTO dto)
         {
@@ -60,6 +70,11 @@ namespace ApiFilmes.Services
 
             _context.Generos.Remove(genero);
             await _context.SaveChangesAsync();
+        }
+
+        internal async Task GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

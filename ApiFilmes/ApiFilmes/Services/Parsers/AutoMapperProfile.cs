@@ -15,7 +15,7 @@ namespace ApiFilmes.Services.Parsers
 
             // Genero
             CreateMap<GeneroDTO, Genero>();
-            CreateMap<Genero, GeneroDTO>();
+            CreateMap<Genero, GeneroDTO>().ForMember(dest => dest.Id, opt => opt.Ignore());
 
             // Diretor
             CreateMap<DiretorDTO, Diretor>();
