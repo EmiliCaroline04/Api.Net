@@ -5,7 +5,8 @@ using AutoMapper;
 
 namespace ApiFilmes.Services.Parsers
 {
-    public class AutoMapperProfile: Profile
+
+    public class AutoMapperProfile: Profile // (OO) Herda da classe base 'Profile' do AutoMapper
     {
         public AutoMapperProfile()
         {

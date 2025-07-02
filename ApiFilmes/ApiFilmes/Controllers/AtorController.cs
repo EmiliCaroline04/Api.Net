@@ -3,13 +3,13 @@ using ApiFilmes.Models;
 using ApiFilmes.Services;
 using ApiFilmes.Services.Exceptions;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json", "application/xml")]
 public class AtorController : ControllerBase
 {
     private readonly IMapper _mapper;
@@ -21,6 +21,10 @@ public class AtorController : ControllerBase
         _atorService = atorService;
     }
 
+
+    [Produces("application/json", "application/xml")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -28,6 +32,9 @@ public class AtorController : ControllerBase
         return Ok(atores);
     }
 
+    [Produces("application/json", "application/xml")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -38,7 +45,9 @@ public class AtorController : ControllerBase
         return Ok(atorDto);
     }
 
-
+    [Produces("application/json", "application/xml")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] AtorDTO dto)
     {
@@ -46,6 +55,10 @@ public class AtorController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = atorCriado.Id }, atorCriado);
     }
 
+
+    [Produces("application/json", "application/xml")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] AtorDTO dto)
     {
@@ -54,6 +67,9 @@ public class AtorController : ControllerBase
     }
 
 
+    [Produces("application/json", "application/xml")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -62,10 +78,13 @@ public class AtorController : ControllerBase
             await _atorService.RemoverAsync(id);
             return NoContent();
         }
-        catch (NotFoundException) // Se seu serviço lançar essa exceção
+        catch (NotFoundException) 
         {
             return NotFound();
         }
     }
 
 }
+
+
+

@@ -20,7 +20,6 @@ namespace ApiFilmes
             builder.Services.AddDbContext<FilmesContext>(options =>
     options.UseNpgsql("Host=localhost;Database=ApiFilmes;Username=postgres;Password=masterkey"));
 
-            // Add services to the container.
 
             builder.Services.AddControllers().AddXmlSerializerFormatters(); // para suportar XML além de JSON
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -44,7 +43,7 @@ namespace ApiFilmes
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+          
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

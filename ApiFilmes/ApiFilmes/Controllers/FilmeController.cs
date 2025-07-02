@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApiFilmes.Services.Exceptions;
+using Microsoft.AspNetCore.Http;
 
 namespace ApiFilmes.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Produces("application/json", "application/xml")]
     public class FilmeController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -23,6 +23,9 @@ namespace ApiFilmes.Controllers
             _filmeService = filmeService;
         }
 
+        [Produces("application/json", "application/xml")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/json")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -34,6 +37,9 @@ namespace ApiFilmes.Controllers
             return Ok(dtoList);
         }
 
+        [Produces("application/json", "application/xml")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -47,6 +53,9 @@ namespace ApiFilmes.Controllers
             return Ok(dto);
         }
 
+        [Produces("application/json", "application/xml")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] FilmeDTO dto)
         {
@@ -62,6 +71,9 @@ namespace ApiFilmes.Controllers
             return CreatedAtAction(nameof(GetById), new { id = novoFilmeDto.Id }, novoFilmeDto);
         }
 
+        [Produces("application/json", "application/xml")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] FilmeDTO dto)
         {
@@ -76,6 +88,9 @@ namespace ApiFilmes.Controllers
             }
         }
 
+        [Produces("application/json", "application/xml")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

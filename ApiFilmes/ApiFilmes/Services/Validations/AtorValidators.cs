@@ -6,8 +6,11 @@ namespace ApiFilmes.Services.Validations
 {
     public class AtorValidators
     {
+        // (Orientada Objeto) Classe de validação específica para AtorDTO
         public class AtorValidator : AbstractValidator<AtorDTO>
         {
+
+            // (Orientação Funcionar) nome não pode ser vazio
             public AtorValidator()
             {
                 RuleFor(x => x.Nome)
