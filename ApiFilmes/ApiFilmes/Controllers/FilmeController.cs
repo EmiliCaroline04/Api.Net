@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApiFilmes.Services.Exceptions;
 using Microsoft.AspNetCore.Http;
+using ApiFilmes.Services.Entidades;
 
 namespace ApiFilmes.Controllers
 {

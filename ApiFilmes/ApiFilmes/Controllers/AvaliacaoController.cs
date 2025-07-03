@@ -1,99 +1,93 @@
 ﻿using ApiFilmes.DTOs;
-using ApiFilmes.BaseDados.Models; // Supondo que Avaliacao está aqui
+using ApiFilmes.BaseDados.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ApiFilmes.Database.Models;
 using ApiFilmes.Services;
-using Microsoft.AspNetCore.Http;
+using ApiFilmes.Services.Entidades;
+using ApiFilmes.Services.Exceptions;
+using System;
 
 namespace ApiFilmes.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-
     [Produces("application/json", "application/xml")]
     public class AvaliacaoController : ControllerBase
     {
-        private readonly FilmesContext _context;
-        private readonly AvaliacaoService _avaliacaoService;
         private readonly IMapper _mapper;
+        private readonly IAvaliacaoService _avaliacaoService;
 
-        public AvaliacaoController(FilmesContext context, IMapper mapper)
+        public AvaliacaoController(IMapper mapper, IAvaliacaoService avaliacaoService)
         {
-            _context = context;
             _mapper = mapper;
+            _avaliacaoService = avaliacaoService;
         }
 
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
+        [ProducesResponseType(typeof(IEnumerable<AvaliacaoDTO>), StatusCodes.Status200OK)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AvaliacaoDTO>>> GetAll()
         {
-            var avaliacoes = await _context.Avaliacoes.ToListAsync();
+            var avaliacoes = await _avaliacaoService.BuscarTodosAsync();
             var avaliacoesDto = _mapper.Map<List<AvaliacaoDTO>>(avaliacoes);
             return Ok(avaliacoesDto);
         }
 
-        [Produces("application/json", "application/xml")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
+        [ProducesResponseType(typeof(AvaliacaoDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var avaliacao = await _avaliacaoService.BuscarPorIdAsync(id);
-            if (avaliacao == null)
-                return NotFound();
-
-            var dto = _mapper.Map<AvaliacaoDTO>(avaliacao);
-            return Ok(dto);
+            try
+            {
+                var avaliacao = await _avaliacaoService.BuscarPorIdAsync(id);
+                return Ok(avaliacao);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { mensagem = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log do erro interno
+                return StatusCode(500, "Erro interno no servidor.");
+            }
         }
 
-        [Produces("application/json", "application/xml")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
+        [ProducesResponseType(typeof(AvaliacaoDTO), StatusCodes.Status201Created)]
         [HttpPost]
         public async Task<ActionResult<AvaliacaoDTO>> Create([FromBody] AvaliacaoDTO dto)
         {
-            var avaliacao = _mapper.Map<Avaliacao>(dto);
-            _context.Avaliacoes.Add(avaliacao);
-            await _context.SaveChangesAsync();
-
-            var novoDto = _mapper.Map<AvaliacaoDTO>(avaliacao);
-            return CreatedAtAction(nameof(GetById), new { id = avaliacao.Id }, novoDto);
+            var novoDto = await _avaliacaoService.AdicionarAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = novoDto.FilmeId }, novoDto);
         }
 
-        [Produces("application/json", "application/xml")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] AvaliacaoDTO dto)
         {
-            var avaliacao = await _context.Avaliacoes.FindAsync(id);
-            if (avaliacao == null)
+            var existente = await _avaliacaoService.BuscarPorIdAsync(id);
+            if (existente == null)
                 return NotFound();
 
-            _mapper.Map(dto, avaliacao);
-            await _context.SaveChangesAsync();
+            await _avaliacaoService.AtualizarAsync(id, dto);
 
             return NoContent();
         }
 
-        [Produces("application/json", "application/xml")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status200OK, "application/json")]
-        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound, "application/xml")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var avaliacao = await _context.Avaliacoes.FindAsync(id);
-            if (avaliacao == null)
+            var existente = await _avaliacaoService.BuscarPorIdAsync(id);
+            if (existente == null)
                 return NotFound();
 
-            _context.Avaliacoes.Remove(avaliacao);
-            await _context.SaveChangesAsync();
-
+            await _avaliacaoService.RemoverAsync(id);
             return NoContent();
         }
     }

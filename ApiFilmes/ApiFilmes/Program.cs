@@ -9,6 +9,7 @@ using ApiFilmes.Services;
 using ApiFilmes.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
+using ApiFilmes.Services.Entidades;
 
 namespace ApiFilmes
 {
@@ -33,13 +34,13 @@ namespace ApiFilmes
             builder.Services.AddScoped<AtorService>();
             builder.Services.AddScoped<GeneroService>();
             builder.Services.AddScoped<FilmeService>();
-            builder.Services.AddScoped<AvaliacaoService>();
+            builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+            builder.Services.AddScoped<AvaliacaoService>(); // Se você injeta o tipo concreto
 
             builder.Services.AddScoped<IFilmeService, FilmeService>();
             builder.Services.AddScoped<IGeneroService, GeneroService>();
             builder.Services.AddScoped<IDiretorService, DiretorService>();
             builder.Services.AddScoped<IAtorService, AtorService>();
-            builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
 
             var app = builder.Build();
 

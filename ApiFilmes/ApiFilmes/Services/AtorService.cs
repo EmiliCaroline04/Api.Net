@@ -1,5 +1,6 @@
 ﻿using ApiFilmes.Database.Models; // (OO) Modelos diretamente do banco
 using ApiFilmes.DTOs; // (OO) Transporte de dados via DTOs
+using ApiFilmes.Services.Entidades;
 using ApiFilmes.Services.Exceptions; // (OO) Exceções personalizadas
 using AutoMapper; // (OO) Mapeamento de entidades para DTOs e vice-versa
 using Microsoft.EntityFrameworkCore;

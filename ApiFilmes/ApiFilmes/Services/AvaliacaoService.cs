@@ -1,6 +1,7 @@
 ﻿using ApiFilmes.BaseDados.Models;
 using ApiFilmes.Database.Models;
 using ApiFilmes.DTOs;
+using ApiFilmes.Services.Entidades;
 using ApiFilmes.Services.Exceptions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;

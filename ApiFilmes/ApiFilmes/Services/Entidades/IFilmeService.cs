@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ApiFilmes.Services
+namespace ApiFilmes.Services.Entidades
 {
     public interface IFilmeService
     {
